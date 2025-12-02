@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AI Study Planner{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Exam Countdown -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Days Until Exam</p>
+                    <p class="text-3xl font-bold text-purple-600">
+                        {% if days_until_exam %}{{ days_until_exam }}{% else %}--{% endif %}
+                    </p>
+                </div>
+                <div class="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
+                    <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Progress -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Topics Completed</p>
+                    <p class="text-3xl font-bold text-green-600">{{ completion_percentage }}%</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ completed_topics }}/{{ total_topics }}</p>
+                </div>
+                <div class="p-3 bg-green-100 dark:bg-green-900 rounded-full">
+                    <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Pomodoros -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Pomodoros</p>
+                    <p class="text-3xl font-bold text-red-600">{{ today_pomodoros }}</p>
+                </div>
+                <div class="p-3 bg-red-100 dark:bg-red-900 rounded-full">
+                    <svg class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productivity Score -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Productivity Score</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ productivity_score }}</p>
+                </div>
+                <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Today's Tasks -->
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Today's Tasks</h2>
+                <a href="{% url 'planner:tasks_today' %}" class="text-sm text-purple-600 hover:text-purple-800">View All →</a>
+            </div>
+            
+            {% if today_tasks %}
+                <div class="space-y-3">
+                    {% for task in today_tasks %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-md transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0 w-2 h-2 rounded-full" style="background-color: {{ task.topic.subject.color }}"></div>
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ task.topic.name }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ task.topic.subject.name }} • {{ task.topic.chapter }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 text-xs font-medium rounded-full 
+                                {% if task.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif task.status == 'missed' %}bg-red-100 text-red-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                            {% if task.status == 'pending' %}
+                            <a href="{% url 'planner:task_complete' task.pk %}" class="text-green-600 hover:text-green-800">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No tasks scheduled for today</p>
+                    <a href="{% url 'planner:generate_schedule' %}" class="mt-4 inline-block text-purple-600 hover:text-purple-800">Generate Schedule →</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Upcoming Revisions & Quick Actions -->
+        <div class="space-y-6">
+            <!-- Upcoming Revisions -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Upcoming Revisions</h2>
+                    <a href="{% url 'planner:revision_list' %}" class="text-sm text-purple-600 hover:text-purple-800">View All →</a>
+                </div>
+                
+                {% if upcoming_revisions %}
+                    <div class="space-y-3">
+                        {% for revision in upcoming_revisions %}
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ revision.topic.name }}</p>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ revision.get_revision_type_display }}</span>
+                                <span class="text-xs text-purple-600">{{ revision.scheduled_date }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No upcoming revisions</p>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+                <div class="space-y-3">
+                    <a href="{% url 'planner:pomodoro_timer' %}" class="block w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-3 transition">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="font-medium">Start Pomodoro</span>
+                        </div>
+                    </a>
+                    <a href="{% url 'planner:upload_syllabus' %}" class="block w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-3 transition">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <span class="font-medium">Upload Syllabus</span>
+                        </div>
+                    </a>
+                    <a href="{% url 'planner:generate_questions' %}" class="block w-full bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-3 transition">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="font-medium">Generate Questions</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Streak Counter -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center">
+                <div class="text-4xl mb-2">🔥</div>
+                <p class="text-3xl font-bold text-orange-600">{{ profile.current_streak }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Day Streak</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">Longest: {{ profile.longest_streak }} days</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
