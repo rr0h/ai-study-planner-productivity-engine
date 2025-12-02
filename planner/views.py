@@ -18,8 +18,8 @@ from .forms import (
 )
 from .ai_utils import (
     extract_topics_from_text, generate_study_schedule, calculate_revision_dates,
-    predict_topic_difficulty, generate_questions, calculate_productivity_score,
-    check_badge_eligibility
+    predict_topic_difficulty, generate_questions as ai_generate_questions, 
+    calculate_productivity_score, check_badge_eligibility
 )
 
 
@@ -303,3 +303,16 @@ def topic_delete(request, pk):
         messages.success(request, 'Topic deleted successfully!')
         return redirect('planner:topic_list')
     return render(request, 'planner/topic_confirm_delete.html', {'topic': topic})
+
+
+# Import additional views from separate modules
+from .views_schedule import (
+    generate_schedule, schedule_calendar, tasks_today, task_update,
+    task_complete, task_miss, revision_list, revision_complete,
+    pomodoro_timer, pomodoro_log, pomodoro_sessions
+)
+
+from .views_analytics import (
+    question_bank, generate_questions, question_detail,
+    analytics, analytics_data, badges, leaderboard
+)
