@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Revisions{% endblock %}
+{% block page_title %}Revision Schedule{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4">Pending Revisions</h2>
+        <div class="space-y-3">
+            {% for revision in pending_revisions %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                    <p class="font-medium">{{ revision.topic.name }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ revision.get_revision_type_display }} • {{ revision.scheduled_date }}</p>
+                </div>
+                <a href="{% url 'planner:revision_complete' revision.pk %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Complete</a>
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-500 py-8">No pending revisions</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4">Completed Revisions</h2>
+        <div class="space-y-2">
+            {% for revision in completed_revisions %}
+            <div class="p-3 bg-green-50 dark:bg-green-900 rounded-lg">
+                <p class="text-sm font-medium">{{ revision.topic.name }}</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">{{ revision.get_revision_type_display }} • Completed {{ revision.completed_at|date:"M d, Y" }}</p>
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-500 py-4">No completed revisions yet</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
