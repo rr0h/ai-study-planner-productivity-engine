@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Generate Schedule{% endblock %}
+{% block page_title %}Generate Study Schedule{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-6">Create Your Study Schedule</h2>
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label class="block text-sm font-medium mb-2">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<p class="text-red-600 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+                {% if field.help_text %}<p class="text-sm text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition">
+                Generate Schedule
+            </button>
+        </form>
+    </div>
+</div>
+<style>input,select{width:100%;padding:0.75rem;border:1px solid #d1d5db;border-radius:0.5rem;}.dark input,.dark select{background-color:#374151;border-color:#4b5563;color:#f3f4f6;}</style>
+{% endblock %}
