@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Badges & Achievements - AI Study Planner{% endblock %}
+{% block page_title %}Badges & Achievements{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm font-medium opacity-90">Total XP</div>
+            <div class="text-4xl font-bold">{{ total_xp }}</div>
+        </div>
+        <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm font-medium opacity-90">Current Streak</div>
+            <div class="text-4xl font-bold">{{ current_streak }} 🔥</div>
+        </div>
+        <div class="bg-gradient-to-br from-green-500 to-teal-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm font-medium opacity-90">Badges Earned</div>
+            <div class="text-4xl font-bold">{{ earned_count }}</div>
+        </div>
+        <div class="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="text-sm font-medium opacity-90">Longest Streak</div>
+            <div class="text-4xl font-bold">{{ longest_streak }}</div>
+        </div>
+    </div>
+
+    <!-- Badges Grid -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6">Your Achievements</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for badge in all_badges %}
+            <div class="relative p-6 rounded-xl border-2 transition-all duration-300
+                        {% if badge.earned %}
+                            border-purple-600 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900 dark:to-blue-900 badge-glow
+                        {% else %}
+                            border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 opacity-60
+                        {% endif %}">
+                
+                <!-- Badge Icon -->
+                <div class="text-center mb-4">
+                    <div class="text-6xl mb-2">{{ badge.icon }}</div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ badge.name }}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ badge.description }}</p>
+                </div>
+
+                <!-- Progress Bar -->
+                {% if not badge.earned %}
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                        <span>Progress</span>
+                        <span>{{ badge.progress }}/{{ badge.target }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-500" 
+                             style="width: {{ badge.progress|floatformat:0|add:'0' }}{{ badge.target|floatformat:0|add:'0' }}%"></div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="mt-4 text-center">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        ✓ Unlocked
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Badge Categories -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Streak Badges -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <span class="text-2xl mr-2">🔥</span>
+                Streak Badges
+            </h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span>7-Day Streak</span>
+                    <span class="{% if current_streak >= 7 %}text-green-600{% else %}text-gray-400{% endif %}">
+                        {% if current_streak >= 7 %}✓{% else %}{{ current_streak }}/7{% endif %}
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span>30-Day Streak</span>
+                    <span class="{% if current_streak >= 30 %}text-green-600{% else %}text-gray-400{% endif %}">
+                        {% if current_streak >= 30 %}✓{% else %}{{ current_streak }}/30{% endif %}
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span>100-Day Streak</span>
+                    <span class="{% if current_streak >= 100 %}text-green-600{% else %}text-gray-400{% endif %}">
+                        {% if current_streak >= 100 %}✓{% else %}{{ current_streak }}/100{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pomodoro Badges -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <span class="text-2xl mr-2">🍅</span>
+                Pomodoro Badges
+            </h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span>100 Pomodoros</span>
+                    <span class="text-gray-400">Progress</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>500 Pomodoros</span>
+                    <span class="text-gray-400">Progress</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>1000 Pomodoros</span>
+                    <span class="text-gray-400">Progress</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Badges -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <span class="text-2xl mr-2">🎓</span>
+                Completion Badges
+            </h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span>All Topics Done</span>
+                    <span class="text-gray-400">Progress</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>All Revisions Done</span>
+                    <span class="text-gray-400">Progress</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Perfect Week</span>
+                    <span class="text-gray-400">Locked</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Motivational Quote -->
+    <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl shadow-lg p-8 text-center text-white">
+        <p class="text-2xl font-bold mb-2">"Success is the sum of small efforts repeated day in and day out."</p>
+        <p class="text-sm opacity-90">Keep earning badges and building your streak! 🚀</p>
+    </div>
+</div>
+{% endblock %}
