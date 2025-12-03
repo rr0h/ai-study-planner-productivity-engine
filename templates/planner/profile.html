@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Settings - AI Study Planner{% endblock %}
+{% block page_title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+        <!-- Profile Header -->
+        <div class="flex items-center space-x-6 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+            <div class="w-24 h-24 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+                {{ user.username|first|upper }}
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ user.username }}</h2>
+                <p class="text-gray-600 dark:text-gray-400">{{ user.email }}</p>
+                <div class="flex items-center space-x-4 mt-2">
+                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm font-medium">
+                        Level {{ profile.total_xp|floatformat:0|add:"100"|slice:":1" }}
+                    </span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ profile.total_xp }} XP</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Form -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.exam_date.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Exam Date
+                </label>
+                {{ form.exam_date }}
+                {% if form.exam_date.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.exam_date.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Set your target exam date for schedule generation</p>
+            </div>
+
+            <div>
+                <label for="{{ form.daily_study_hours.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Daily Study Hours
+                </label>
+                {{ form.daily_study_hours }}
+                {% if form.daily_study_hours.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.daily_study_hours.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">How many hours can you study per day?</p>
+            </div>
+
+            <div>
+                <label for="{{ form.theme_preference.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Theme Preference
+                </label>
+                {{ form.theme_preference }}
+                {% if form.theme_preference.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.theme_preference.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-6">
+                <a href="{% url 'planner:dashboard' %}" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    Cancel
+                </a>
+                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+
+        <!-- Stats Section -->
+        <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold mb-4">Your Statistics</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-2xl font-bold text-purple-600">{{ profile.total_xp }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Total XP</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-2xl font-bold text-orange-600">{{ profile.current_streak }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Current Streak</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600">{{ profile.longest_streak }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Longest Streak</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600">{{ user.badges.count }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Badges Earned</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="date"], input[type="number"], select {
+        appearance: none;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+    .dark input[type="date"], .dark input[type="number"], .dark select {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f3f4f6;
+    }
+    input[type="date"]:focus, input[type="number"]:focus, select:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+</style>
+{% endblock %}
