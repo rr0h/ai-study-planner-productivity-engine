@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Subjects{% endblock %}
+{% block page_title %}My Subjects{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'planner:subject_create' %}" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition inline-block">
+        + Add Subject
+    </a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for subject in subjects %}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-4 h-4 rounded-full" style="background-color: {{ subject.color }}"></div>
+                <h3 class="text-xl font-bold">{{ subject.name }}</h3>
+            </div>
+        </div>
+        <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p>Topics: {{ subject.topic_count }}</p>
+            <p>Completed: {{ subject.completed_count }}</p>
+        </div>
+        <div class="flex space-x-2">
+            <a href="{% url 'planner:subject_edit' subject.pk %}" class="text-blue-600 hover:text-blue-800">Edit</a>
+            <a href="{% url 'planner:subject_delete' subject.pk %}" class="text-red-600 hover:text-red-800">Delete</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-3 text-center py-12">
+        <p class="text-gray-500">No subjects yet. Add your first subject!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
